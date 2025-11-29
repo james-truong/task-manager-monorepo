@@ -59,21 +59,27 @@ app.use(authRouter);
 app.use(taskRouter);
 
 // ============================================
-// STATIC FILES - Serve frontend in production
+// STATIC FILES - Serve frontend in production (Vercel only)
 // ============================================
-if (process.env.NODE_ENV === 'production') {
-  const path = require('path');
+// For Render deployment, we don't serve static files (backend only)
+// For Vercel deployment, we serve both backend and frontend
+const path = require('path');
+const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+const fs = require('fs');
 
+// Check if frontend/dist exists (only exists in Vercel monorepo deployment)
+const shouldServeStatic = fs.existsSync(frontendDistPath);
+
+if (process.env.NODE_ENV === 'production' && shouldServeStatic) {
   // Serve static files from frontend/dist
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  app.use(express.static(frontendDistPath));
 
   // Catch-all route - serve index.html for client-side routing
-  // Express v5 syntax: use /* instead of *
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+  app.use((req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
 } else {
-  // Development mode - show API info
+  // Development mode or Render deployment - show API info
   app.get('/', (req, res) => {
     res.send({
       message: 'Task Manager API',
