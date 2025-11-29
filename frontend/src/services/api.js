@@ -2,11 +2,11 @@
 // This handles all HTTP requests and includes authentication headers
 
 // API URL configuration:
-// - Production (Vercel monorepo): Use /api (same domain, routed by vercel.json)
+// - Production (Vercel monorepo): Use '' (same domain, Express serves both API and frontend)
 // - Development: Use localhost:3000 (separate backend server)
 // - Can be overridden with VITE_API_URL environment variable
 const API_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '/api' : 'http://localhost:3000');
+  (import.meta.env.PROD ? '' : 'http://localhost:3000');
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {

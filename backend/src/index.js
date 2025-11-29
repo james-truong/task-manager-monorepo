@@ -59,29 +59,42 @@ app.use(authRouter);
 app.use(taskRouter);
 
 // ============================================
-// ROOT ROUTE - Test endpoint
+// STATIC FILES - Serve frontend in production
 // ============================================
-app.get('/', (req, res) => {
-  res.send({
-    message: 'Task Manager API',
-    version: '1.0.0',
-    endpoints: {
-      auth: {
-        signup: 'POST /users/signup',
-        login: 'POST /users/login',
-        logout: 'POST /users/logout',
-        profile: 'GET /users/me'
-      },
-      tasks: {
-        create: 'POST /tasks',
-        getAll: 'GET /tasks',
-        getOne: 'GET /tasks/:id',
-        update: 'PATCH /tasks/:id',
-        delete: 'DELETE /tasks/:id'
-      }
-    }
+if (process.env.NODE_ENV === 'production') {
+  const path = require('path');
+
+  // Serve static files from frontend/dist
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+
+  // Catch-all route - serve index.html for client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
   });
-});
+} else {
+  // Development mode - show API info
+  app.get('/', (req, res) => {
+    res.send({
+      message: 'Task Manager API',
+      version: '1.0.0',
+      endpoints: {
+        auth: {
+          signup: 'POST /users/signup',
+          login: 'POST /users/login',
+          logout: 'POST /users/logout',
+          profile: 'GET /users/me'
+        },
+        tasks: {
+          create: 'POST /tasks',
+          getAll: 'GET /tasks',
+          getOne: 'GET /tasks/:id',
+          update: 'PATCH /tasks/:id',
+          delete: 'DELETE /tasks/:id'
+        }
+      }
+    });
+  });
+}
 
 // ============================================
 // START SERVER (Local Development Only)
