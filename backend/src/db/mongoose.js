@@ -14,6 +14,16 @@ const options = {
   socketTimeoutMS: 45000,      // Close sockets after 45s of inactivity
 };
 
+// Debug: Log connection string info (without exposing password)
+const connStr = process.env.MONGODB_URL;
+console.log('🔍 MongoDB Connection Debug:');
+console.log('  - Connection string defined:', !!connStr);
+console.log('  - Connection string length:', connStr?.length);
+console.log('  - Starts with mongodb+srv:', connStr?.startsWith('mongodb+srv:'));
+console.log('  - Contains newline:', connStr?.includes('\n'));
+console.log('  - Contains carriage return:', connStr?.includes('\r'));
+console.log('  - First 20 chars:', connStr?.substring(0, 20));
+
 // Connect to MongoDB
 // mongoose.connect() returns a Promise
 mongoose.connect(process.env.MONGODB_URL, options)
@@ -22,6 +32,8 @@ mongoose.connect(process.env.MONGODB_URL, options)
   })
   .catch((error) => {
     console.error('❌ MongoDB connection error:', error);
+    console.error('❌ Error name:', error.name);
+    console.error('❌ Error message:', error.message);
     // In serverless, don't exit - let function retry
     if (process.env.NODE_ENV !== 'production') {
       process.exit(1);
