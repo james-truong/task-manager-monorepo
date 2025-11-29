@@ -8,6 +8,10 @@ const app = require('../backend/src/index');
 
 // Export a Vercel serverless function handler
 module.exports = async (req, res) => {
-  // Let Express handle the request
+  // Strip /api prefix from the URL before passing to Express
+  // Example: /api/users/signup -> /users/signup
+  req.url = req.url.replace(/^\/api/, '') || '/';
+
+  // Let Express handle the request with the modified URL
   return app(req, res);
 };
