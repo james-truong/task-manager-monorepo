@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install --prefix backend && npm install --prefix frontend --include=dev && cd frontend && npx vite build && mkdir -p public && cp -r frontend/dist/* public/",
+  "buildCommand": "npm install --prefix backend && npm install --prefix frontend --include=dev && cd frontend && npx vite build && cd .. && mkdir -p public && cp -r frontend/dist/* public/",
   "rewrites": [
     {
       "source": "/((?!api/.*).*)",
