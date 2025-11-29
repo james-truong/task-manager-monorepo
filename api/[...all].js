@@ -1,7 +1,7 @@
 // ============================================
-// VERCEL SERVERLESS API ENDPOINT
+// VERCEL SERVERLESS API CATCH-ALL ROUTE
 // ============================================
-// This file serves the entire Express backend as a Vercel serverless function
+// This catches all /api/* routes and forwards them to Express
 
 // Import the Express app
 const app = require('../backend/src/index');
