@@ -68,7 +68,8 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../frontend/dist')));
 
   // Catch-all route - serve index.html for client-side routing
-  app.get('*', (req, res) => {
+  // Express v5 syntax: use /* instead of *
+  app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
   });
 } else {
