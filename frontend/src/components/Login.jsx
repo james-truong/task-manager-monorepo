@@ -1,10 +1,16 @@
 import { useState, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { AuthContext } from '../context/AuthContext';
 
-const Login = ({ onSwitchToSignup }) => {
+const Login = () => {
   // ========== ACCESS AUTH CONTEXT ==========
   // useContext hook lets us access the AuthContext values
   const { login, error } = useContext(AuthContext);
+
+  // Navigation and location hooks
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ========== FORM STATE (Controlled Components) ==========
   // Store the values of our form inputs in state
@@ -27,13 +33,13 @@ const Login = ({ onSwitchToSignup }) => {
 
     // Validate inputs before sending to API
     if (!email || !password) {
-      setFormError('Please fill in all fields');
+      toast.error('Please fill in all fields');
       return;
     }
 
     // Basic email validation
     if (!email.includes('@')) {
-      setFormError('Please enter a valid email');
+      toast.error('Please enter a valid email');
       return;
     }
 
@@ -45,13 +51,16 @@ const Login = ({ onSwitchToSignup }) => {
       const result = await login(email, password);
 
       if (!result.success) {
-        // Login failed - show error
-        setFormError(result.error);
+        // Login failed - show error toast
+        toast.error(result.error || 'Login failed');
+      } else {
+        // Login successful - show success toast and redirect
+        toast.success('Login successful!');
+        const from = location.state?.from?.pathname || '/tasks';
+        navigate(from, { replace: true });
       }
-      // If success, AuthContext will update isAuthenticated
-      // and App.jsx will automatically redirect to tasks page
     } catch (err) {
-      setFormError('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     } finally {
       // Always stop loading, whether success or failure
       setIsLoading(false);
@@ -111,13 +120,9 @@ const Login = ({ onSwitchToSignup }) => {
         {/* Switch to signup */}
         <p className="auth-switch">
           Don't have an account?{' '}
-          <button
-            onClick={onSwitchToSignup}
-            className="link-button"
-            disabled={isLoading}
-          >
+          <Link to="/signup" className="link-button">
             Sign up
-          </button>
+          </Link>
         </p>
       </div>
     </div>

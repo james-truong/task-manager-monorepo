@@ -9,6 +9,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 // Import database connection
 require('./db/mongoose');
@@ -26,6 +27,10 @@ const port = process.env.PORT || 3000;
 // ============================================
 // MIDDLEWARE
 // ============================================
+
+// Security Headers - Protect against common vulnerabilities
+// Helmet sets various HTTP headers to secure the app
+app.use(helmet());
 
 // CORS - Allow frontend to communicate with backend
 // In development: allow localhost

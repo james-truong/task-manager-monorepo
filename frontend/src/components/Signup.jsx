@@ -1,9 +1,15 @@
 import { useState, useContext } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { AuthContext } from '../context/AuthContext';
 
-const Signup = ({ onSwitchToLogin }) => {
+const Signup = () => {
   // ========== ACCESS AUTH CONTEXT ==========
   const { signup, error } = useContext(AuthContext);
+
+  // Navigation and location hooks
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ========== FORM STATE (Controlled Components) ==========
   // Signup needs one extra field (name) compared to Login
@@ -24,19 +30,19 @@ const Signup = ({ onSwitchToLogin }) => {
 
     // Validate all fields are filled
     if (!name || !email || !password) {
-      setFormError('Please fill in all fields');
+      toast.error('Please fill in all fields');
       return;
     }
 
     // Validate email format
     if (!email.includes('@')) {
-      setFormError('Please enter a valid email');
+      toast.error('Please enter a valid email');
       return;
     }
 
     // Validate password length (your API might have requirements)
     if (password.length < 6) {
-      setFormError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       return;
     }
 
@@ -47,12 +53,16 @@ const Signup = ({ onSwitchToLogin }) => {
       const result = await signup(name, email, password);
 
       if (!result.success) {
-        setFormError(result.error);
+        toast.error(result.error || 'Signup failed');
+      } else {
+        // Signup successful - user is automatically logged in
+        toast.success('Account created successfully! Welcome!');
+        // Redirect to intended page or /tasks
+        const from = location.state?.from?.pathname || '/tasks';
+        navigate(from, { replace: true });
       }
-      // If success, user is automatically logged in
-      // AuthContext updates isAuthenticated = true
     } catch (err) {
-      setFormError('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -124,13 +134,9 @@ const Signup = ({ onSwitchToLogin }) => {
         {/* Switch to login */}
         <p className="auth-switch">
           Already have an account?{' '}
-          <button
-            onClick={onSwitchToLogin}
-            className="link-button"
-            disabled={isLoading}
-          >
+          <Link to="/login" className="link-button">
             Login
-          </button>
+          </Link>
         </p>
       </div>
     </div>

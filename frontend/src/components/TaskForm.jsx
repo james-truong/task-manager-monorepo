@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { tasksAPI } from '../services/api';
 
 // onTaskCreated is a prop - a function passed from the parent component
@@ -18,21 +19,15 @@ const TaskForm = ({ onTaskCreated }) => {
   // Track loading state during API call
   const [isLoading, setIsLoading] = useState(false);
 
-  // Store any errors
-  const [error, setError] = useState(null);
-
   // ========== FORM SUBMISSION ==========
 
   const handleSubmit = async (e) => {
     // Prevent default form submission (which reloads the page)
     e.preventDefault();
 
-    // Clear any previous errors
-    setError(null);
-
     // Validate input - don't allow empty tasks
     if (!description.trim()) {
-      setError('Please enter a task description');
+      toast.error('Please enter a task description');
       return;
     }
 
@@ -48,14 +43,17 @@ const TaskForm = ({ onTaskCreated }) => {
       setDueDate('');
       setPriority('medium');  // Reset to default
 
+      // Show success toast
+      toast.success('Task created successfully!');
+
       // Call the callback function from parent
       // This tells the parent (TaskList) to refresh and show the new task
       if (onTaskCreated) {
         onTaskCreated();
       }
     } catch (err) {
-      // Show error message if task creation fails
-      setError('Failed to create task: ' + err.message);
+      // Show error toast if task creation fails
+      toast.error(`Failed to create task: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -66,13 +64,6 @@ const TaskForm = ({ onTaskCreated }) => {
   return (
     <div className="task-form">
       <form onSubmit={handleSubmit}>
-        {/* Show error message if there is one */}
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-
         <div className="form-group">
           {/* Task description input - controlled component */}
           <input

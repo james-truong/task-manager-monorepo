@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { tasksAPI } from '../services/api';
 
 const TaskList = () => {
@@ -53,7 +54,8 @@ const TaskList = () => {
       // This triggers a re-render and displays the tasks
       setTasks(data);
     } catch (err) {
-      // If API call fails, show error message
+      // If API call fails, show error toast
+      toast.error(`Failed to load tasks: ${err.message}`);
       setError(err.message);
     } finally {
       // Always stop loading, whether success or failure
@@ -72,8 +74,11 @@ const TaskList = () => {
       // After successful update, refresh the task list
       // This ensures UI is in sync with the database
       fetchTasks();
+
+      // Show success toast
+      toast.success(!currentStatus ? 'Task completed!' : 'Task marked as active');
     } catch (err) {
-      setError('Failed to update task: ' + err.message);
+      toast.error(`Failed to update task: ${err.message}`);
     }
   };
 
@@ -104,8 +109,11 @@ const TaskList = () => {
 
       // After all updates succeed, refresh the task list
       await fetchTasks();
+
+      // Show success toast
+      toast.success(`${incompleteTasks.length} task${incompleteTasks.length === 1 ? '' : 's'} completed!`);
     } catch (err) {
-      setError('Failed to mark all complete: ' + err.message);
+      toast.error(`Failed to mark all complete: ${err.message}`);
     } finally {
       setIsMarkingAllComplete(false);
     }
@@ -114,20 +122,56 @@ const TaskList = () => {
   // ========== DELETE TASK ==========
 
   const handleDelete = async (taskId) => {
-    // Ask user to confirm deletion
-    if (!window.confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
-
-    try {
-      // Call API to delete the task
-      await tasksAPI.deleteTask(taskId);
-
-      // After successful deletion, refresh the task list
-      fetchTasks();
-    } catch (err) {
-      setError('Failed to delete task: ' + err.message);
-    }
+    // Use toast.promise for better UX with confirmation
+    toast((t) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <p>Are you sure you want to delete this task?</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              // Delete the task
+              toast.promise(
+                tasksAPI.deleteTask(taskId).then(() => fetchTasks()),
+                {
+                  loading: 'Deleting task...',
+                  success: 'Task deleted successfully!',
+                  error: (err) => `Failed to delete: ${err.message}`,
+                }
+              );
+            }}
+            style={{
+              padding: '5px 15px',
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 15px',
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      style: {
+        minWidth: '300px'
+      }
+    });
   };
 
   // ========== INLINE EDITING HANDLERS ==========
@@ -142,7 +186,7 @@ const TaskList = () => {
   const handleSaveEdit = async (taskId) => {
     // Don't save if description is empty
     if (!editedDescription.trim()) {
-      setError('Task description cannot be empty');
+      toast.error('Task description cannot be empty');
       return;
     }
 
@@ -156,8 +200,11 @@ const TaskList = () => {
 
       // Refresh task list to show updated description
       await fetchTasks();
+
+      // Show success toast
+      toast.success('Task updated successfully!');
     } catch (err) {
-      setError('Failed to update task: ' + err.message);
+      toast.error(`Failed to update task: ${err.message}`);
     }
   };
 

@@ -1,20 +1,18 @@
 import { useState, useContext, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
 import TasksPage from './pages/TasksPage';
 import UserPage from './pages/UserPage';
 import './App.css';
 
-// ========== MAIN APP CONTENT ==========
-// This component has access to AuthContext because it's wrapped by AuthProvider
-const AppContent = () => {
-  // Access authentication state from context
-  const { user, isAuthenticated, isLoading, logout } = useContext(AuthContext);
-
-  // State to toggle between Login and Signup views
-  const [showLogin, setShowLogin] = useState(true);
+// ========== AUTHENTICATED APP LAYOUT ==========
+// This component renders the header and navigation for authenticated users
+const AuthenticatedLayout = ({ children }) => {
+  const { user, logout } = useContext(AuthContext);
 
   // Dark mode state - check localStorage or default to false
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -37,31 +35,6 @@ const AppContent = () => {
     setIsDarkMode(prev => !prev);
   };
 
-  // ========== LOADING STATE ==========
-  // Show loading while checking if user is already logged in
-  if (isLoading) {
-    return (
-      <div className="loading-container">
-        <div className="loading">Loading...</div>
-      </div>
-    );
-  }
-
-  // ========== NOT AUTHENTICATED - SHOW LOGIN/SIGNUP ==========
-  if (!isAuthenticated) {
-    return (
-      <div className="app">
-        {/* Conditional rendering - show either Login or Signup */}
-        {showLogin ? (
-          <Login onSwitchToSignup={() => setShowLogin(false)} />
-        ) : (
-          <Signup onSwitchToLogin={() => setShowLogin(true)} />
-        )}
-      </div>
-    );
-  }
-
-  // ========== AUTHENTICATED - SHOW APP WITH ROUTING ==========
   return (
     <div className="app">
       {/* Header with navigation and user info */}
@@ -90,20 +63,56 @@ const AppContent = () => {
         </div>
       </header>
 
-      {/* Main content area with routes */}
+      {/* Main content area */}
       <main className="app-main">
-        <Routes>
-          {/* Redirect root to /tasks */}
-          <Route path="/" element={<Navigate to="/tasks" replace />} />
-
-          {/* Tasks page route */}
-          <Route path="/tasks" element={<TasksPage />} />
-
-          {/* User profile page route */}
-          <Route path="/user" element={<UserPage />} />
-        </Routes>
+        {children}
       </main>
     </div>
+  );
+};
+
+// ========== MAIN APP CONTENT ==========
+// This component defines all routes for the application
+const AppContent = () => {
+  return (
+    <Routes>
+      {/* Public routes - anyone can access */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Protected routes - require authentication */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Navigate to="/tasks" replace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <TasksPage />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user"
+        element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <UserPage />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all route - redirect to login */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 };
 
@@ -116,6 +125,30 @@ const App = () => {
       {/* AuthProvider makes auth state available to all child components */}
       <AuthProvider>
         <AppContent />
+        {/* Toast notification container */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: 'var(--card-bg)',
+              color: 'var(--text-color)',
+              border: '1px solid var(--border-color)',
+            },
+            success: {
+              iconTheme: {
+                primary: 'var(--success-color)',
+                secondary: 'white',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: 'var(--danger-color)',
+                secondary: 'white',
+              },
+            },
+          }}
+        />
       </AuthProvider>
     </BrowserRouter>
   );
