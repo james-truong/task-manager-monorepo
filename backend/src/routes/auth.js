@@ -154,11 +154,14 @@ router.delete('/users/me', auth, async (req, res) => {
 // ============================================
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
   try {
+    console.log('📤 Avatar POST: Upload started', { userId: req.user._id, filename: req.file?.filename });
+
     // Delete old avatar if exists
     if (req.user.avatar) {
       const oldAvatarPath = path.join(uploadsDir, req.user.avatar);
       if (fs.existsSync(oldAvatarPath)) {
         fs.unlinkSync(oldAvatarPath);
+        console.log('🗑️  Avatar POST: Deleted old avatar', { oldAvatarPath });
       }
     }
 
@@ -166,12 +169,21 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
     req.user.avatar = req.file.filename;
     await req.user.save();
 
+    const newAvatarPath = path.join(uploadsDir, req.user.avatar);
+    console.log('✅ Avatar POST: Upload complete', {
+      avatar: req.user.avatar,
+      path: newAvatarPath,
+      exists: fs.existsSync(newAvatarPath)
+    });
+
     res.send({ message: 'Avatar uploaded successfully', avatar: req.user.avatar });
   } catch (error) {
+    console.log('❌ Avatar POST: Error', error.message);
     res.status(400).send({ error: error.message });
   }
 }, (error, req, res, next) => {
   // Error handling middleware for multer errors
+  console.log('❌ Avatar POST: Multer error', error.message);
   res.status(400).send({ error: error.message });
 });
 
@@ -206,17 +218,22 @@ router.get('/users/:id/avatar', async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user || !user.avatar) {
+      console.log('❌ Avatar GET: User or avatar not found', { userId: req.params.id, hasUser: !!user, avatar: user?.avatar });
       throw new Error('Avatar not found');
     }
 
     const avatarPath = path.join(uploadsDir, user.avatar);
+    console.log('🔍 Avatar GET: Looking for file', { avatarPath, exists: fs.existsSync(avatarPath) });
 
     if (!fs.existsSync(avatarPath)) {
+      console.log('❌ Avatar GET: File not found on disk', { avatarPath });
       throw new Error('Avatar file not found');
     }
 
+    console.log('✅ Avatar GET: Sending file', { avatarPath });
     res.sendFile(avatarPath);
   } catch (error) {
+    console.log('❌ Avatar GET: Error', error.message);
     res.status(404).send();
   }
 });
