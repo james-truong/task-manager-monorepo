@@ -12,6 +12,9 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
+// Define absolute path to uploads directory
+const uploadsDir = path.join(__dirname, '../../uploads/avatars');
+
 // ============================================
 // POST /users/signup - Create new user
 // ============================================
@@ -153,7 +156,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
   try {
     // Delete old avatar if exists
     if (req.user.avatar) {
-      const oldAvatarPath = path.join(__dirname, '../../src/uploads/avatars', req.user.avatar);
+      const oldAvatarPath = path.join(uploadsDir, req.user.avatar);
       if (fs.existsSync(oldAvatarPath)) {
         fs.unlinkSync(oldAvatarPath);
       }
@@ -179,7 +182,7 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
   try {
     // Delete avatar file if exists
     if (req.user.avatar) {
-      const avatarPath = path.join(__dirname, '../../src/uploads/avatars', req.user.avatar);
+      const avatarPath = path.join(uploadsDir, req.user.avatar);
       if (fs.existsSync(avatarPath)) {
         fs.unlinkSync(avatarPath);
       }
@@ -206,7 +209,7 @@ router.get('/users/:id/avatar', async (req, res) => {
       throw new Error('Avatar not found');
     }
 
-    const avatarPath = path.join(__dirname, '../../src/uploads/avatars', user.avatar);
+    const avatarPath = path.join(uploadsDir, user.avatar);
 
     if (!fs.existsSync(avatarPath)) {
       throw new Error('Avatar file not found');

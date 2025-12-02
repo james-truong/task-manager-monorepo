@@ -6,11 +6,14 @@
 const multer = require('multer');
 const path = require('path');
 
+// Define absolute path to uploads directory
+const uploadsDir = path.join(__dirname, '../../uploads/avatars');
+
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Save uploaded files to uploads/avatars directory
-    cb(null, 'src/uploads/avatars');
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     // Create unique filename: userId-timestamp.extension
