@@ -180,7 +180,12 @@ const UserPage = () => {
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar preview" className="avatar-img" />
               ) : user.avatar ? (
-                <img src={authAPI.getAvatarUrl(user._id)} alt={user.name} className="avatar-img" />
+                <img
+                  key={user.avatar}
+                  src={authAPI.getAvatarUrl(user._id)}
+                  alt={user.name}
+                  className="avatar-img"
+                />
               ) : (
                 <div className="avatar-initial">
                   {user.name?.charAt(0).toUpperCase()}

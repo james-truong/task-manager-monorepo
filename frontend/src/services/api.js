@@ -120,9 +120,10 @@ export const authAPI = {
     return handleResponse(response);
   },
 
-  // Get user avatar URL
+  // Get user avatar URL with cache-busting
   getAvatarUrl: (userId) => {
-    return `${API_URL}/users/${userId}/avatar`;
+    // Add timestamp to prevent browser caching issues after upload
+    return `${API_URL}/users/${userId}/avatar?t=${Date.now()}`;
   }
 };
 
