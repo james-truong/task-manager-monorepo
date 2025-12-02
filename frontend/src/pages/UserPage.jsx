@@ -7,7 +7,7 @@ import { tasksAPI, authAPI } from '../services/api';
 // This is what users see at the /user route
 const UserPage = () => {
   // Access user data from context
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, refreshUser } = useContext(AuthContext);
 
   // State for task statistics
   const [stats, setStats] = useState({
@@ -93,8 +93,9 @@ const UserPage = () => {
     try {
       await authAPI.uploadAvatar(file);
       toast.success('Profile picture uploaded successfully!');
-      // Reload page to show new avatar
-      window.location.reload();
+      // Refresh user data to show new avatar
+      await refreshUser();
+      setAvatarPreview(null);
     } catch (err) {
       toast.error(`Failed to upload avatar: ${err.message}`);
       setAvatarPreview(null);
@@ -113,7 +114,7 @@ const UserPage = () => {
             onClick={() => {
               toast.dismiss(t.id);
               toast.promise(
-                authAPI.deleteAvatar().then(() => window.location.reload()),
+                authAPI.deleteAvatar().then(() => refreshUser()),
                 {
                   loading: 'Deleting avatar...',
                   success: 'Profile picture deleted!',

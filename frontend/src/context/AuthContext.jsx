@@ -95,6 +95,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Refresh user data - useful after profile updates (e.g., avatar upload)
+  const refreshUser = async () => {
+    try {
+      const userData = await authAPI.getProfile();
+      setUser(userData);
+      return { success: true };
+    } catch (err) {
+      console.error('Failed to refresh user data:', err);
+      return { success: false, error: err.message };
+    }
+  };
+
   // ========== PROVIDE VALUES TO APP ==========
 
   // Everything in this object is accessible to child components
@@ -105,7 +117,8 @@ export const AuthProvider = ({ children }) => {
     error,             // Any error messages
     signup,            // Function to signup
     login,             // Function to login
-    logout             // Function to logout
+    logout,            // Function to logout
+    refreshUser        // Function to refresh user data
   };
 
   // Wrap children with Provider - now all child components can access 'value'
