@@ -1,6 +1,6 @@
 # Render Deployment Guide
 
-This guide explains how to deploy the Task Manager application to Render.
+This guide explains how to deploy the Noted application to Render.
 
 ## Architecture
 
@@ -68,7 +68,7 @@ curl https://YOUR-BACKEND-URL.onrender.com
 You should see:
 ```json
 {
-  "message": "Task Manager API",
+  "message": "Noted API",
   "version": "1.0.0",
   "endpoints": {
     "auth": { ... },

@@ -39,7 +39,7 @@ const AuthenticatedLayout = ({ children }) => {
     <div className="app">
       {/* Header with navigation and user info */}
       <header className="app-header">
-        <h1>Task Manager</h1>
+        <h1>Noted</h1>
 
         {/* Navigation Links */}
         <nav className="app-nav">

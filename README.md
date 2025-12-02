@@ -1,6 +1,6 @@
-# Task Manager Monorepo
+# Noted - Task Management App
 
-Full-stack task management application with React frontend and Express backend, deployed on Vercel.
+Full-stack task management application with React frontend and Express backend, deployed on Render.
 
 ## Project Structure
 

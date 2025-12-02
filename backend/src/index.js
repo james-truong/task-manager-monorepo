@@ -68,7 +68,7 @@ app.use(taskRouter);
 // ============================================
 app.get('/', (req, res) => {
   res.send({
-    message: 'Task Manager API',
+    message: 'Noted API',
     version: '1.0.0',
     endpoints: {
       auth: {
