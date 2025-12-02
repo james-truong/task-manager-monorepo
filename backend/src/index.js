@@ -30,7 +30,10 @@ const port = process.env.PORT || 3000;
 
 // Security Headers - Protect against common vulnerabilities
 // Helmet sets various HTTP headers to secure the app
-app.use(helmet());
+// Configure CORP to allow cross-origin image loading (needed for avatars)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // CORS - Allow frontend to communicate with backend
 // In development: allow localhost
