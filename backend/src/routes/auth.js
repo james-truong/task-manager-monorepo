@@ -4,8 +4,11 @@
 // Routes for user signup, login, logout, and profile
 
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const upload = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -140,6 +143,78 @@ router.delete('/users/me', auth, async (req, res) => {
 
   } catch (error) {
     res.status(500).send();
+  }
+});
+
+// ============================================
+// POST /users/me/avatar - Upload profile picture
+// ============================================
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+  try {
+    // Delete old avatar if exists
+    if (req.user.avatar) {
+      const oldAvatarPath = path.join(__dirname, '../../src/uploads/avatars', req.user.avatar);
+      if (fs.existsSync(oldAvatarPath)) {
+        fs.unlinkSync(oldAvatarPath);
+      }
+    }
+
+    // Save new avatar filename to user
+    req.user.avatar = req.file.filename;
+    await req.user.save();
+
+    res.send({ message: 'Avatar uploaded successfully', avatar: req.user.avatar });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+}, (error, req, res, next) => {
+  // Error handling middleware for multer errors
+  res.status(400).send({ error: error.message });
+});
+
+// ============================================
+// DELETE /users/me/avatar - Delete profile picture
+// ============================================
+router.delete('/users/me/avatar', auth, async (req, res) => {
+  try {
+    // Delete avatar file if exists
+    if (req.user.avatar) {
+      const avatarPath = path.join(__dirname, '../../src/uploads/avatars', req.user.avatar);
+      if (fs.existsSync(avatarPath)) {
+        fs.unlinkSync(avatarPath);
+      }
+    }
+
+    // Remove avatar from user
+    req.user.avatar = undefined;
+    await req.user.save();
+
+    res.send({ message: 'Avatar deleted successfully' });
+  } catch (error) {
+    res.status(500).send();
+  }
+});
+
+// ============================================
+// GET /users/:id/avatar - Get user's profile picture
+// ============================================
+router.get('/users/:id/avatar', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error('Avatar not found');
+    }
+
+    const avatarPath = path.join(__dirname, '../../src/uploads/avatars', user.avatar);
+
+    if (!fs.existsSync(avatarPath)) {
+      throw new Error('Avatar file not found');
+    }
+
+    res.sendFile(avatarPath);
+  } catch (error) {
+    res.status(404).send();
   }
 });
 

@@ -90,6 +90,39 @@ export const authAPI = {
     });
 
     return handleResponse(response);
+  },
+
+  // Upload profile picture
+  uploadAvatar: async (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/users/me/avatar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+        // Don't set Content-Type - let browser set it with boundary for multipart/form-data
+      },
+      body: formData
+    });
+
+    return handleResponse(response);
+  },
+
+  // Delete profile picture
+  deleteAvatar: async () => {
+    const response = await fetch(`${API_URL}/users/me/avatar`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+
+    return handleResponse(response);
+  },
+
+  // Get user avatar URL
+  getAvatarUrl: (userId) => {
+    return `${API_URL}/users/${userId}/avatar`;
   }
 };
 

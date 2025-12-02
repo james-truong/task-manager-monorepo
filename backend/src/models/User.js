@@ -38,7 +38,10 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     }
-  }]
+  }],
+  avatar: {
+    type: String         // Stores the filename of the profile picture
+  }
 }, {
   timestamps: true       // Automatically add createdAt and updatedAt fields
 });

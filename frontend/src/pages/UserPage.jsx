@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { AuthContext } from '../context/AuthContext';
-import { tasksAPI } from '../services/api';
+import { tasksAPI, authAPI } from '../services/api';
 
 // UserPage - Displays user profile information and task statistics
 // This is what users see at the /user route
@@ -17,6 +18,11 @@ const UserPage = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // State for avatar upload
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Fetch tasks and calculate statistics
   useEffect(() => {
@@ -53,6 +59,102 @@ const UserPage = () => {
     ? Math.round((stats.completed / stats.total) * 100)
     : 0;
 
+  // Handle avatar file selection
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload avatar
+    handleAvatarUpload(file);
+  };
+
+  // Upload avatar to server
+  const handleAvatarUpload = async (file) => {
+    setUploadingAvatar(true);
+    try {
+      await authAPI.uploadAvatar(file);
+      toast.success('Profile picture uploaded successfully!');
+      // Reload page to show new avatar
+      window.location.reload();
+    } catch (err) {
+      toast.error(`Failed to upload avatar: ${err.message}`);
+      setAvatarPreview(null);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  // Delete avatar
+  const handleDeleteAvatar = async () => {
+    toast((t) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <p>Are you sure you want to delete your profile picture?</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              toast.promise(
+                authAPI.deleteAvatar().then(() => window.location.reload()),
+                {
+                  loading: 'Deleting avatar...',
+                  success: 'Profile picture deleted!',
+                  error: (err) => `Failed to delete: ${err.message}`,
+                }
+              );
+            }}
+            style={{
+              padding: '5px 15px',
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            style={{
+              padding: '5px 15px',
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      style: {
+        minWidth: '300px'
+      }
+    });
+  };
+
   // Show loading if user data isn't available yet
   if (!user) {
     return (
@@ -71,9 +173,46 @@ const UserPage = () => {
 
         {/* Profile Card */}
         <div className="profile-card">
-          {/* User Avatar/Initial */}
-          <div className="profile-avatar">
-            {user.name?.charAt(0).toUpperCase()}
+          {/* User Avatar */}
+          <div className="profile-avatar-section">
+            <div className="profile-avatar">
+              {avatarPreview ? (
+                <img src={avatarPreview} alt="Avatar preview" className="avatar-img" />
+              ) : user.avatar ? (
+                <img src={authAPI.getAvatarUrl(user._id)} alt={user.name} className="avatar-img" />
+              ) : (
+                <div className="avatar-initial">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            {/* Avatar Upload Buttons */}
+            <div className="avatar-actions">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleAvatarChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+              >
+                {uploadingAvatar ? 'Uploading...' : user.avatar ? 'Change Photo' : 'Upload Photo'}
+              </button>
+              {user.avatar && (
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={handleDeleteAvatar}
+                  disabled={uploadingAvatar}
+                >
+                  Remove Photo
+                </button>
+              )}
+            </div>
           </div>
 
           {/* User Information */}
