@@ -4,4 +4,14 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Configure dev server for SPA routing
+  server: {
+    // Fallback to index.html for any route that doesn't match a file
+    // This allows React Router to handle all routes during development
+    historyApiFallback: true
+  },
+  // Configure preview server (npm run preview) for SPA routing
+  preview: {
+    historyApiFallback: true
+  }
 })
