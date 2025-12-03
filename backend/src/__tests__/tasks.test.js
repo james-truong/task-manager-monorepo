@@ -30,10 +30,12 @@ beforeAll(async () => {
   await mongoose.connect(testDbUrl);
 });
 
-// Cleanup: Clear database before each test
+// Cleanup: Clear database and rebuild indexes before each test
 beforeEach(async () => {
-  await User.deleteMany({});
-  await Task.deleteMany({});
+  await User.collection.drop().catch(() => {}); // Drop collection (ignore error if doesn't exist)
+  await Task.collection.drop().catch(() => {});
+  await User.createIndexes(); // Recreate indexes
+  await Task.createIndexes();
 });
 
 // Teardown: Close database connection after all tests

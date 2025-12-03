@@ -50,7 +50,7 @@ const Signup = () => {
 
     try {
       // Call the signup function from AuthContext
-      const result = await signup(name, email, password);
+      const result = await signup(name.trim(), email.trim(), password);
 
       if (!result.success) {
         toast.error(result.error || 'Signup failed');

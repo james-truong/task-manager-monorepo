@@ -51,7 +51,7 @@ describe('Signup Component', () => {
   it('shows link to login page', () => {
     renderSignup();
 
-    const loginLink = screen.getByRole('link', { name: /log in/i });
+    const loginLink = screen.getByRole('link', { name: /login/i });
     expect(loginLink).toBeInTheDocument();
     expect(loginLink).toHaveAttribute('href', '/login');
   });
@@ -107,18 +107,30 @@ describe('Signup Component', () => {
     await user.click(signupButton);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/tasks');
+      expect(mockNavigate).toHaveBeenCalledWith('/tasks', { replace: true });
     });
   });
 
-  it('disables submit button while loading', () => {
-    renderSignup({
-      ...mockAuthContextValue,
-      isLoading: true,
-    });
+  it('disables submit button while loading', async () => {
+    const user = userEvent.setup();
+    mockSignup.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100)));
+    renderSignup();
 
-    const signupButton = screen.getByRole('button', { name: /signing up/i });
-    expect(signupButton).toBeDisabled();
+    const nameInput = screen.getByLabelText(/name/i);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/^password/i);
+    const signupButton = screen.getByRole('button', { name: /sign up/i });
+
+    await user.type(nameInput, 'John Doe');
+    await user.type(emailInput, 'john@example.com');
+    await user.type(passwordInput, 'password123');
+    await user.click(signupButton);
+
+    // Button should now show "Creating account..." and be disabled
+    await waitFor(() => {
+      const loadingButton = screen.getByRole('button', { name: /creating account/i });
+      expect(loadingButton).toBeDisabled();
+    });
   });
 
   it('prevents form submission with empty fields', async () => {

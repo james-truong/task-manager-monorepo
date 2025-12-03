@@ -139,6 +139,19 @@ userSchema.pre('save', async function(next) {
   next(); // Continue with save
 });
 
+// ============================================
+// MIDDLEWARE - Delete user's tasks when user is deleted
+// ============================================
+// This runs before removing a user
+// It deletes all tasks owned by the user
+
+userSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+  const user = this;
+  const Task = mongoose.model('Task');
+  await Task.deleteMany({ owner: user._id });
+  next();
+});
+
 // Create the model from the schema
 const User = mongoose.model('User', userSchema);
 

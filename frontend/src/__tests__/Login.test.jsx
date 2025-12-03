@@ -106,18 +106,28 @@ describe('Login Component', () => {
     await user.click(loginButton);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/tasks');
+      expect(mockNavigate).toHaveBeenCalledWith('/tasks', { replace: true });
     });
   });
 
-  it('disables submit button while loading', () => {
-    renderLogin({
-      ...mockAuthContextValue,
-      isLoading: true,
-    });
+  it('disables submit button while loading', async () => {
+    const user = userEvent.setup();
+    mockLogin.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100)));
+    renderLogin();
 
-    const loginButton = screen.getByRole('button', { name: /logging in/i });
-    expect(loginButton).toBeDisabled();
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, 'password123');
+    await user.click(loginButton);
+
+    // Button should now show "Logging in..." and be disabled
+    await waitFor(() => {
+      const loadingButton = screen.getByRole('button', { name: /logging in/i });
+      expect(loadingButton).toBeDisabled();
+    });
   });
 
   it('shows error message on failed login', async () => {
