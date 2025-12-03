@@ -13,5 +13,12 @@ export default defineConfig({
   // Configure preview server (npm run preview) for SPA routing
   preview: {
     historyApiFallback: true
+  },
+  // Configure Vitest
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    css: true
   }
 })
