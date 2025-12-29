@@ -48,11 +48,80 @@ task-manager-monorepo/
 
 ## Development Setup
 
-### Prerequisites
+### Option 1: Docker (Recommended) 🐳
+
+The easiest way to get started! Docker Compose will set up MongoDB, backend, and frontend with a single command.
+
+#### Prerequisites
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+#### Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/james-truong/task-manager-monorepo.git
+cd task-manager-monorepo
+
+# Start all services (MongoDB, backend, frontend)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+**That's it!** 🎉 The app will be available at:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000
+- MongoDB: localhost:27017
+
+#### Docker Commands
+
+```bash
+# Rebuild images after code changes to Dockerfile
+docker-compose up -d --build
+
+# Clean restart (removes database data)
+docker-compose down -v && docker-compose up -d
+
+# View logs for specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f mongodb
+
+# Stop and remove all containers
+docker-compose down
+```
+
+#### Hot Reload
+
+Source code changes are automatically detected:
+- **Backend**: Nodemon watches for changes in `backend/src/`
+- **Frontend**: Vite dev server watches for changes in `frontend/src/`
+
+#### Default Credentials
+
+**MongoDB:**
+- Username: `admin`
+- Password: `adminpassword`
+- Database: `task-manager`
+
+**Important:** Change these credentials in production! Update `docker-compose.yml`.
+
+---
+
+### Option 2: Manual Setup
+
+If you prefer to run services manually without Docker:
+
+#### Prerequisites
 - Node.js 18+
 - MongoDB (local or Atlas)
 
-### 1. Install Dependencies
+#### 1. Install Dependencies
 
 ```bash
 # Install backend dependencies
