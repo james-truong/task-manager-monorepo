@@ -59,7 +59,7 @@ const Login = () => {
         const from = location.state?.from?.pathname || '/tasks';
         navigate(from, { replace: true });
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('An unexpected error occurred');
     } finally {
       // Always stop loading, whether success or failure

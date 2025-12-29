@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
 
 // Create the AuthContext - this is like creating a "global variable" that any component can access
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
 // AuthProvider component that wraps the entire app
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
           const userData = await authAPI.getProfile();
           setUser(userData);
           setIsAuthenticated(true);
-        } catch (err) {
+        } catch (_err) {
           // Token is invalid or expired, clear it
           localStorage.removeItem('token');
           setUser(null);
