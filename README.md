@@ -2,6 +2,10 @@
 
 Full-stack task management application with React frontend and Express backend, deployed on Render.
 
+[![CI](https://github.com/james-truong/task-manager-monorepo/workflows/CI/badge.svg)](https://github.com/james-truong/task-manager-monorepo/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/james-truong/task-manager-monorepo/workflows/CodeQL%20Security%20Analysis/badge.svg)](https://github.com/james-truong/task-manager-monorepo/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/james-truong/task-manager-monorepo/branch/main/graph/badge.svg)](https://codecov.io/gh/james-truong/task-manager-monorepo)
+
 ## Project Structure
 
 ```

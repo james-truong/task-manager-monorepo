@@ -273,7 +273,7 @@ const TaskList = () => {
       let comparison = 0;
 
       switch (sortBy) {
-        case 'date':
+        case 'date': {
           // Handle tasks without due dates - push them to the end
           if (!a.dueDate && !b.dueDate) return 0;
           if (!a.dueDate) return 1;  // a goes after b
@@ -284,14 +284,16 @@ const TaskList = () => {
           const dateB = new Date(b.dueDate);
           comparison = dateA - dateB;
           break;
+        }
 
-        case 'priority':
+        case 'priority': {
           // Define priority order: high(3) > medium(2) > low(1)
           const priorityValues = { high: 3, medium: 2, low: 1 };
           const priorityA = priorityValues[a.priority] || priorityValues.medium;
           const priorityB = priorityValues[b.priority] || priorityValues.medium;
           comparison = priorityB - priorityA; // Higher priority first by default
           break;
+        }
 
         case 'name':
           // Alphabetical comparison (case-insensitive)

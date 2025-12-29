@@ -1,0 +1,47 @@
+# Codecov configuration for task-manager-monorepo
+
+coverage:
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 5%
+        if_ci_failed: error
+
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+
+# Flag-based coverage
+flags:
+  backend:
+    paths:
+      - backend/src/
+    carryforward: true
+
+  frontend:
+    paths:
+      - frontend/src/
+    carryforward: true
+
+# Comment on PRs
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+# Ignore paths
+ignore:
+  - "backend/node_modules"
+  - "frontend/node_modules"
+  - "backend/coverage"
+  - "frontend/coverage"
+  - "**/*.test.js"
+  - "**/*.test.jsx"
+  - "**/*.spec.js"
+  - "**/*.spec.jsx"
+  - "**/test/**"
+  - "**/__tests__/**"

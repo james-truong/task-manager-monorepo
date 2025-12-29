@@ -16,7 +16,7 @@ class ErrorBoundary extends React.Component {
   }
 
   // This lifecycle method is called when an error is thrown
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     // Update state so the next render shows the fallback UI
     return { hasError: true };
   }
@@ -57,7 +57,7 @@ class ErrorBoundary extends React.Component {
             <p>We're sorry for the inconvenience. The application encountered an unexpected error.</p>
 
             {/* Show error details in development mode */}
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="error-details">
                 <summary>Error Details (Development Only)</summary>
                 <pre>{this.state.error.toString()}</pre>
