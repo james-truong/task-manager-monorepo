@@ -68,7 +68,7 @@ jobs:
           echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Post PR comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
