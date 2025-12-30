@@ -202,6 +202,33 @@ git push -u origin main
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
+## API Documentation
+
+Interactive API documentation is available via Swagger UI, allowing you to view all endpoints and test them directly in your browser.
+
+### Accessing Swagger UI
+
+**Local Development:**
+1. Start the backend server:
+   ```bash
+   cd backend
+   npm run dev
+   ```
+2. Visit: http://localhost:3000/api-docs
+
+**Features:**
+- 📖 View all API endpoints with detailed request/response schemas
+- 🧪 Test endpoints directly in the browser (Try it out)
+- 🔐 Authenticate with JWT tokens to test protected routes
+- 📝 See parameter descriptions, data types, and validation rules
+- ✅ View example requests and responses
+
+**How to Test Protected Endpoints:**
+1. Use the `/users/signup` or `/users/login` endpoint to get a JWT token
+2. Click the "Authorize" button at the top of Swagger UI
+3. Enter your token in the format: `Bearer <your-token-here>`
+4. Now you can test all authenticated endpoints (tasks, profile, etc.)
+
 ## API Endpoints
 
 Backend API is available at `/api/*` in production:
