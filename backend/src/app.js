@@ -25,10 +25,17 @@ const app = express();
 // Security Headers - Protect against common vulnerabilities
 // Helmet sets various HTTP headers to secure the app
 // Configure CORP to allow cross-origin image loading (needed for avatars)
-// Disable CSP for Swagger UI to work (it needs inline scripts/styles)
+// Configure CSP to allow Swagger UI inline scripts while maintaining security
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for Swagger UI
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for Swagger UI
+      imgSrc: ["'self'", "data:", "https:"] // Allow images from self, data URIs, and HTTPS
+    }
+  }
 }));
 
 // CORS - Allow frontend to communicate with backend
