@@ -25,8 +25,10 @@ const app = express();
 // Security Headers - Protect against common vulnerabilities
 // Helmet sets various HTTP headers to secure the app
 // Configure CORP to allow cross-origin image loading (needed for avatars)
+// Disable CSP for Swagger UI to work (it needs inline scripts/styles)
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false
 }));
 
 // CORS - Allow frontend to communicate with backend
@@ -63,7 +65,11 @@ app.use(express.json());
 // This allows developers to view and test API endpoints directly in the browser
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Task Manager API Docs'
+  customSiteTitle: 'Task Manager API Docs',
+  swaggerOptions: {
+    validatorUrl: null, // Disable validator to prevent TLS errors on localhost
+    displayRequestDuration: true
+  }
 }));
 
 // Register routers
