@@ -226,7 +226,7 @@ Interactive API documentation is available via Swagger UI, allowing you to view 
 **How to Test Protected Endpoints:**
 1. Use the `/users/signup` or `/users/login` endpoint to get a JWT token
 2. Click the "Authorize" button at the top of Swagger UI
-3. Enter your token in the format: `Bearer <your-token-here>`
+3. Paste your token (Swagger UI automatically adds "Bearer " prefix)
 4. Now you can test all authenticated endpoints (tasks, profile, etc.)
 
 ## API Endpoints
