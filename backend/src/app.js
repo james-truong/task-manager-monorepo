@@ -23,20 +23,23 @@ const app = express();
 // ============================================
 
 // Security Headers - Protect against common vulnerabilities
-// Helmet sets various HTTP headers to secure the app
-// Configure CORP to allow cross-origin image loading (needed for avatars)
-// Configure CSP to allow Swagger UI inline scripts while maintaining security
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for Swagger UI
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for Swagger UI
-      imgSrc: ["'self'", "data:", "https:"] // Allow images from self, data URIs, and HTTPS
+// Only enable helmet in production to avoid HSTS issues on localhost
+// In development, we skip helmet to allow Swagger UI to work without HTTPS
+if (process.env.NODE_ENV === 'production') {
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:", "blob:"],
+        fontSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"]
+      }
     }
-  }
-}));
+  }));
+}
 
 // CORS - Allow frontend to communicate with backend
 // In development: allow localhost
@@ -74,8 +77,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Task Manager API Docs',
   swaggerOptions: {
-    validatorUrl: null, // Disable validator to prevent TLS errors on localhost
-    displayRequestDuration: true
+    validatorUrl: 'none', // Disable validator to prevent TLS errors on localhost
+    displayRequestDuration: true,
+    tryItOutEnabled: true
   }
 }));
 
