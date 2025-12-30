@@ -8,6 +8,8 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./config/swagger');
 
 // Import routers
 const authRouter = require('./routes/auth');
@@ -53,6 +55,16 @@ app.use(limiter);
 // Parse incoming JSON requests
 // This makes req.body available in our route handlers
 app.use(express.json());
+
+// ============================================
+// SWAGGER API DOCUMENTATION
+// ============================================
+// Serve interactive API documentation at /api-docs
+// This allows developers to view and test API endpoints directly in the browser
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Task Manager API Docs'
+}));
 
 // Register routers
 app.use(authRouter);
